@@ -9,12 +9,8 @@ const useRTD = (url: string, sub: (msg: any) => void) => {
     useEffect(() => {
         if(!url) return;
         function handleRealtimeConnection() {
-            WS.getInstance(url).then((wss: WS) => {
-                rtd.current = wss;
-                if (sub){
-                    wss.on(sub);
-                }
-                
+            WS.getInstance(url, sub).then((wss: WS) => {
+                rtd.current = wss;    
             })
         }
         return handleRealtimeConnection();
@@ -23,12 +19,12 @@ const useRTD = (url: string, sub: (msg: any) => void) => {
     useEffect(()=>{
        return () => {
            if (rtd.current !== null) {
-               rtd.current.socket.close()
+               rtd.current.socket!.close()
            }
        }
     }, [])
 
-    function publisher(payload: any) {
+    function publish(payload: any) {
         if (rtd.current !== null) {
             rtd.current.send(payload);
         }
@@ -36,7 +32,7 @@ const useRTD = (url: string, sub: (msg: any) => void) => {
     }
 
     return {
-        publisher
+        publish
     }
 
 }

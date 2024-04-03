@@ -84,7 +84,7 @@ function Game({ userInfo }) {
 
     async function handleCreateGame() {
         try {
-            const response = await axiosInstance.post('game', { userId: userInfo.email });
+            const response = await axiosInstance.post('game/create', { userId: userInfo.email });
             setGame(response.data.game);
         } catch (error) {
             console.error('Error creating game:', error);
