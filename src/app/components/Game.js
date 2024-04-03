@@ -1,11 +1,11 @@
 
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { axiosInstance } from '../utils/axiosInstance'; // Import your Axios instance
 // pages/_app.js
 import 'tailwindcss/tailwind.css';
 import React from 'react';
-import useRTD from '../hooks/useRTD';
+import RTDServices from '../utils/RealtimeGameData/services';
 
 function TicTacToe({ game, publish, player }) {
     const [winnerAnimation, setWinnerAnimation] = useState(false);
@@ -62,12 +62,33 @@ function TicTacToe({ game, publish, player }) {
 
 function TicTacToeWrap({ game, user }) {
     const [realtimeGame, setRealtimeGame] = useState(game);
-    const {publish} = useRTD(`game/${game.id}`, (msg) => {
-        console.log("Received msg from wss!!", msg);
-        if (msg.type === 'gameStateUpdate') {
-            setRealtimeGame(msg.gameState)
+    const rtdInstanceRef = useRef(null);
+    const gameId = game.id;
+
+    useEffect(()=>{
+        RTDServices.service.getInstance({ gameId }).then((instance)=> {
+            if(!instance.rtd) return;
+            rtdInstanceRef.current = instance;
+            instance.subscribe.call(instance, ((msg)=>{
+                if (msg.type === 'gameStateUpdate') {
+                    setRealtimeGame(msg.gameState)
+                } 
+            }))
+        })  
+        return () => {
+            if (rtdInstanceRef.current){
+                rtdInstanceRef.current.unsubscribe();
+                rtdInstanceRef.current = null;
+            }
+        }       
+    }, [gameId])
+
+    const publish = useCallback((message)=>{
+        if (rtdInstanceRef.current){
+            rtdInstanceRef.current.publish(message);
         }
-    })
+    }, [])
+    
     return (
         <div className="p-4 border border-gray-300 rounded">
             <p className="text-lg font-semibold">Game ID: {game.id}</p>
