@@ -1,7 +1,11 @@
 import WsRTD from './WsRTD'
 import SseRTd from './SseRTd'
-
-const is_sse_enabled = true;
+import { featureConfigs } from '../../configs/game' 
 export default class RTDServices {
-    static service = is_sse_enabled ? SseRTd : WsRTD;
+    static getService(params) {
+        if (featureConfigs.use_sse){
+            return SseRTd;
+        }
+        return WsRTD;
+    } 
 }

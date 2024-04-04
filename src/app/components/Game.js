@@ -6,6 +6,7 @@ import { axiosInstance } from '../utils/axiosInstance'; // Import your Axios ins
 import 'tailwindcss/tailwind.css';
 import React from 'react';
 import RTDServices from '../utils/RealtimeGameData/services';
+import { featureConfigs } from '../configs/game';
 
 function TicTacToe({ game, publish, player }) {
     const [winnerAnimation, setWinnerAnimation] = useState(false);
@@ -66,8 +67,8 @@ function TicTacToeWrap({ game, user }) {
     const gameId = game.id;
 
     useEffect(()=>{
-        RTDServices.service.getInstance({ gameId }).then((instance)=> {
-            if(!instance.rtd) return;
+        RTDServices.getService().getInstance({ gameId }).then((instance)=> {
+            if (!instance || instance.rtd) return;
             rtdInstanceRef.current = instance;
             instance.subscribe.call(instance, ((msg)=>{
                 if (msg.type === 'gameStateUpdate') {
@@ -105,7 +106,7 @@ function Game({ userInfo }) {
 
     async function handleCreateGame() {
         try {
-            const response = await axiosInstance.post('game/create', { userId: userInfo.email });
+            const response = await axiosInstance.post('game/create', { userId: userInfo.email, useAiOpponent: featureConfigs.use_ai_opponent });
             setGame(response.data.game);
         } catch (error) {
             console.error('Error creating game:', error);
