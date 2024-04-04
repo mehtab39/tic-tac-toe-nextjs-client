@@ -1,4 +1,4 @@
 export const featureConfigs = {
-    use_sse: false,
+    use_sse: true,
     use_ai_opponent: false
 }

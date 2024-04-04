@@ -68,7 +68,7 @@ function TicTacToeWrap({ game, user }) {
 
     useEffect(()=>{
         RTDServices.getService().getInstance({ gameId }).then((instance)=> {
-            if (!instance || instance.rtd) return;
+            if (!instance || !instance.rtd) return;
             rtdInstanceRef.current = instance;
             instance.subscribe.call(instance, ((msg)=>{
                 if (msg.type === 'gameStateUpdate') {
