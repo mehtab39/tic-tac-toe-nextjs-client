@@ -106,7 +106,7 @@ function Game({ userInfo }) {
 
     async function handleCreateGame() {
         try {
-            const response = await axiosInstance.post('game/create', { userId: userInfo.email, useAiOpponent: featureConfigs.use_ai_opponent });
+            const response = await axiosInstance.post('game/create', { userId: userInfo.Username, useAiOpponent: featureConfigs.use_ai_opponent });
             setGame(response.data.game);
         } catch (error) {
             console.error('Error creating game:', error);
@@ -115,8 +115,7 @@ function Game({ userInfo }) {
 
     async function handleStartGame() {
         try {
-            const response = await axiosInstance.post(`game/start/${game.id}`, { userId: userInfo.email });
-
+            const response = await axiosInstance.post(`game/start/${game.id}`, { userId: userInfo.Username });
             setGame(response.data.game);
         } catch (error) {
             console.error('Error starting game:', error);
@@ -155,7 +154,7 @@ function Game({ userInfo }) {
         );
     }
 
-    if (!game.players.includes(userInfo.email)) {
+    if (!game.players.includes(userInfo.Username)) {
         return (<button onClick={handleStartGame} className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
             Start Game
         </button>)
