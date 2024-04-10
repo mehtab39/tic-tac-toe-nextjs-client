@@ -7,7 +7,8 @@ import 'tailwindcss/tailwind.css';
 import React from 'react';
 import RTDServices from '../utils/RealtimeGameData/services';
 import { featureConfigs } from '../configs/game';
-
+import axios from 'axios';
+import GameStats from './GameStats'
 function TicTacToe({ game, publish, player }) {
     const [winnerAnimation, setWinnerAnimation] = useState(false);
 
@@ -63,6 +64,15 @@ function TicTacToe({ game, publish, player }) {
 
 function TicTacToeWrap({ game, user }) {
     const [realtimeGame, setRealtimeGame] = useState(game);
+    const [stats, setStats] = useState(null);
+
+    useEffect(()=>{
+        const getStats = async () => {
+            const res = await axios.get(`http://localhost:8081/api/game-stats/${user.Username}`);
+            setStats(res.data)
+        }
+        getStats();
+    },  [])
     const rtdInstanceRef = useRef(null);
     const gameId = game.id;
 
@@ -93,7 +103,8 @@ function TicTacToeWrap({ game, user }) {
     return (
         <div className="p-4 border border-gray-300 rounded">
             <p className="text-lg font-semibold">Game ID: {game.id}</p>
-            <TicTacToe player={user.email} game={realtimeGame} publish={publish} />
+            <TicTacToe player={user.Username} game={realtimeGame} publish={publish} />
+            {stats && <GameStats stats={stats}/>}
         </div>
     );
 }
